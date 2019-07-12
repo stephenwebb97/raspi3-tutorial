@@ -1,0 +1,2 @@
+export PATH="$PATH:/home/stephen/uni/comp6841/something-awesome/raspi3-tutorial/.bin/gcc-arm-8.3-2019.03-x86_64-aarch64-elf/bin:/home/stephen/uni/comp6841/something-awesome/raspi3-tutorial/.bin"
+

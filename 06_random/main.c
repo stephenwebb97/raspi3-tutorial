@@ -36,8 +36,10 @@ void main()
     uart_hex(rand(0,4294967295));
     uart_puts("\n");
 
+    char * test = "Test";
+
     // echo everything back
     while(1) {
-        uart_send(uart_getc());
+        uart_puts(test);
     }
 }
