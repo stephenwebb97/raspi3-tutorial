@@ -48,6 +48,7 @@ void main()
     // make gcc happy about unused variables :-)
     r++;
 
+    uart_puts("SuccessFully Returned From Handler\n");
     // echo everything back
     while(1) {
         uart_send(uart_getc());

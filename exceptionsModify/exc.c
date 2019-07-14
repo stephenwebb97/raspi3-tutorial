@@ -30,6 +30,7 @@
  */
 void exc_handler(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, unsigned long far)
 {
+    void * returnAddress = (void *)elr;
     // print out interruption type
     switch(type) {
         case 0: uart_puts("Synchronous"); break;
@@ -51,7 +52,7 @@ void exc_handler(unsigned long type, unsigned long esr, unsigned long elr, unsig
         case 0b100101: uart_puts("Data abort, same EL"); break;
         case 0b100110: uart_puts("Stack alignment fault"); break;
         case 0b101100: uart_puts("Floating point"); break;
-        default: uart_puts("Unknown"); break;
+        default: uart_puts("Unknown Default"); break;
     }
     // decode data abort cause
     if(esr>>26==0b100100 || esr>>26==0b100101) {
@@ -83,15 +84,37 @@ void exc_handler(unsigned long type, unsigned long esr, unsigned long elr, unsig
     uart_hex(far>>32);
     uart_hex(far);
     uart_puts("\n");
+
+    // ----------------------- FOR TESTING --------------------------- //
+
+    // Skips over the faulting address
+    returnAddress = returnAddress + 1;
+    asm volatile ("msr esr_el1, %0":"=r" (returnAddress));
+    asm volatile ("mov x2, #(0)");
+    asm volatile ("msr spsr_el1, x2");
+    asm volatile ("eret");
     // no return from exception for now
-    while(1);
+    // while(1);
 }
 
 void exc_hyper_handler(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, unsigned long far)
 {
+    void * el1_vector_table;
+
     uart_puts("Hyper Event Handler\n");
-    asm volatile ("mrs x1, vbar_el1");
-    asm volatile ("msr elr_el2, x1");
+
+    asm volatile ("msr esr_el1, %0":"=r" (esr));
+    asm volatile ("msr elr_el1, %0":"=r" (elr));
+    asm volatile ("msr spsr_el1, %0":"=r" (spsr));
+    asm volatile ("msr far_el1, %0":"=r" (far));
+
+    asm volatile ("mov x2, #(1<<2)");
+    asm volatile ("msr spsr_el2, x2");
+
+    // So It Maps To the correct interupt handler 
+    asm volatile ("mrs %0, vbar_el1":"=r" (el1_vector_table));
+    el1_vector_table = el1_vector_table + (type * 128);
+    asm volatile ("msr elr_el2, %0":"=r" (el1_vector_table));
     asm volatile ("eret");
     // // print out interruption type
     // switch(type) {

@@ -56,7 +56,7 @@ _start:
     msr     elr_el3, x2
     eret
 
-    // running at EL2?
+    // running at EL2
 5:  cmp     x0, #4
     beq     5f
     msr     sp_el1, x1 //Set the el1 stack pointer to _start
@@ -72,7 +72,7 @@ _start:
     // enable AArch64 in EL1
     mov     x0, #(1 << 31)      // AArch64
     orr     x0, x0, #(1 << 1)   // SWIO hardwired on Pi3
-    orr     x0, x0, #(1 << 27)   // enable TGE
+    //orr     x0, x0, #(1 << 27)   // enable TGE
     msr     hcr_el2, x0
     mrs     x0, hcr_el2
     // Setup SCTLR access
@@ -89,12 +89,12 @@ _start:
 
     // change execution level to EL1
     mov     x2, #(1<<2) //The Ret Stack Pointer of EL1h
-    orr     x2, x2, #(1<<4) //FIQ mask
+/*    orr     x2, x2, #(1<<4) //FIQ mask
     orr     x2, x2, #(1<<6) //FIQ mask
     orr     x2, x2, #(1<<7) //IRQ mask
     orr     x2, x2, #(1<<8) //SError mask
     orr     x2, x2, #(1<<9) //Debug mask
-
+*/
     msr     spsr_el2, x2
     adr     x2, 5f
     msr     elr_el2, x2
