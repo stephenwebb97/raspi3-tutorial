@@ -109,10 +109,10 @@ void exc_hyper_handler_lower(unsigned long type, unsigned long esr, unsigned lon
 
     uart_puts("Hyper Event Lower Handler\n");
 
-    asm volatile ("msr esr_el1, %0":"=r" (esr));
-    asm volatile ("msr elr_el1, %0":"=r" (elr));
-    asm volatile ("msr spsr_el1, %0":"=r" (spsr));
-    asm volatile ("msr far_el1, %0":"=r" (far));
+    asm volatile ("msr esr_el1, %0"::"r" (esr));
+    asm volatile ("msr elr_el1, %0"::"r" (elr));
+    asm volatile ("msr spsr_el1, %0"::"r" (spsr));
+    asm volatile ("msr far_el1, %0"::"r" (far));
 
     asm volatile ("mov x2, #(1<<2)");
     asm volatile ("msr spsr_el2, x2");
