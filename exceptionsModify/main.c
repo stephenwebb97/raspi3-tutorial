@@ -36,12 +36,16 @@ void main()
 
     asm volatile ("mrs %0, CurrentEL" : "=r" (el));
 
+
+
     uart_puts("Current EL is: ");
     uart_hex((el>>2)&3);
     uart_puts("\n");
+
+    mmu_init();
     
     // set up paging
-    mmu_init();
+    
 
     // generate a Data Abort with a bad address access
     r=*((volatile unsigned int*)0xFFFFFFFFFF000000);

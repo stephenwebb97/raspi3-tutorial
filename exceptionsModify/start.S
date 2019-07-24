@@ -72,7 +72,8 @@ _start:
     // enable AArch64 in EL1
     mov     x0, #(1 << 31)      // AArch64
     orr     x0, x0, #(1 << 1)   // SWIO hardwired on Pi3
-    //orr     x0, x0, #(1 << 27)   // enable TGE
+    orr     x0, x0, #(1 << 26)   // enable TVM Virtual Memory Control
+    orr     x0, x0, #(1 << 0)   // Turn On The MMU
     msr     hcr_el2, x0
     mrs     x0, hcr_el2
     // Setup SCTLR access
@@ -88,7 +89,7 @@ _start:
 
 
     // change execution level to EL1
-    mov     x2, #(1<<2) //The Ret Stack Pointer of EL1h
+    mov     x2, #(4) //The Ret Stack Pointer of EL1h
 /*    orr     x2, x2, #(1<<4) //FIQ mask
     orr     x2, x2, #(1<<6) //FIQ mask
     orr     x2, x2, #(1<<7) //IRQ mask
