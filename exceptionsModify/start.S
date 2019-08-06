@@ -72,8 +72,10 @@ _start:
     // enable AArch64 in EL1
     mov     x0, #(1 << 31)      // AArch64
     orr     x0, x0, #(1 << 1)   // SWIO hardwired on Pi3
-    orr     x0, x0, #(1 << 26)   // enable TVM Virtual Memory Control
-    orr     x0, x0, #(1 << 0)   // Turn On The MMU
+    // orr     x0, x0, #(1 << 26)   // enable TVM Virtual Memory Control
+    // orr     x0, x0, #(1 << 0)   // Turn On The MMU
+    // orr     x0, x0, #(1 << 26)   // Virtual Memory Controls
+    // orr     x0, x0, #(1 << 20)   // TVM Trap IMPLEMENTATION DEFINED functionality
     msr     hcr_el2, x0
     mrs     x0, hcr_el2
     // Setup SCTLR access
@@ -117,19 +119,19 @@ _start:
     b       1b
 
     // important, code has to be properly aligned
-    .align 11
+.balign 0x800
 _vectors:
     // synchronous
-    .align  7
+    .balign 0x80
     mov     x0, #0
     mrs     x1, esr_el1
     mrs     x2, elr_el1
     mrs     x3, spsr_el1
     mrs     x4, far_el1
-    b       exc_handler
+    b       exc_to_el2
 
     // IRQ
-    .align  7
+    .balign 0x80
     mov     x0, #1
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -138,7 +140,7 @@ _vectors:
     b       exc_handler
 
     // FIQ
-    .align  7
+    .balign 0x80
     mov     x0, #2
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -147,7 +149,7 @@ _vectors:
     b       exc_handler
 
     // SError
-    .align  7
+    .balign 0x80
     mov     x0, #3
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -155,16 +157,16 @@ _vectors:
     mrs     x4, far_el1
     b       exc_handler
 
-    .align  7
+    .balign 0x80
     mov     x0, #0
     mrs     x1, esr_el1
     mrs     x2, elr_el1
     mrs     x3, spsr_el1
     mrs     x4, far_el1
-    b       exc_handler
+    b       exc_to_el2
 
     // IRQ
-    .align  7
+    .balign 0x80
     mov     x0, #1
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -173,7 +175,7 @@ _vectors:
     b       exc_handler
 
     // FIQ
-    .align  7
+    .balign 0x80
     mov     x0, #2
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -182,7 +184,7 @@ _vectors:
     b       exc_handler
 
     // SError
-    .align  7
+    .balign 0x80
     mov     x0, #3
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -190,16 +192,16 @@ _vectors:
     mrs     x4, far_el1
     b       exc_handler
 
-    .align  7
+    .balign 0x80
     mov     x0, #0
     mrs     x1, esr_el1
     mrs     x2, elr_el1
     mrs     x3, spsr_el1
     mrs     x4, far_el1
-    b       exc_handler
+    b       exc_to_el2
 
     // IRQ
-    .align  7
+    .balign 0x80
     mov     x0, #1
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -208,7 +210,7 @@ _vectors:
     b       exc_handler
 
     // FIQ
-    .align  7
+    .balign 0x80
     mov     x0, #2
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -217,7 +219,7 @@ _vectors:
     b       exc_handler
 
     // SError
-    .align  7
+    .balign 0x80
     mov     x0, #3
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -225,16 +227,16 @@ _vectors:
     mrs     x4, far_el1
     b       exc_handler
 
-    .align  7
+    .balign 0x80
     mov     x0, #0
     mrs     x1, esr_el1
     mrs     x2, elr_el1
     mrs     x3, spsr_el1
     mrs     x4, far_el1
-    b       exc_handler
+    b       exc_to_el2
 
     // IRQ
-    .align  7
+    .balign 0x80
     mov     x0, #1
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -243,7 +245,7 @@ _vectors:
     b       exc_handler
 
     // FIQ
-    .align  7
+    .balign 0x80
     mov     x0, #2
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -252,7 +254,7 @@ _vectors:
     b       exc_handler
 
     // SError
-    .align  7
+    .balign 0x80
     mov     x0, #3
     mrs     x1, esr_el1
     mrs     x2, elr_el1
@@ -261,11 +263,11 @@ _vectors:
     b       exc_handler
 
 
-
+.balign 0x800
 _hyper_vectors:
 // -------- CurrentEL SP0 -----------//
     // synchronous
-    .align  7
+    .balign 0x80
     mov     x0, #0
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -274,7 +276,7 @@ _hyper_vectors:
     b       exc_hyper_handler_current
 
     // IRQ
-    .align  7
+    .balign 0x80
     mov     x0, #1
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -283,7 +285,7 @@ _hyper_vectors:
     b       exc_hyper_handler_current
 
     // FIQ
-    .align  7
+    .balign 0x80
     mov     x0, #2
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -292,7 +294,7 @@ _hyper_vectors:
     b       exc_hyper_handler_current
 
     // SError
-    .align  7
+    .balign 0x80
     mov     x0, #3
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -302,7 +304,7 @@ _hyper_vectors:
 
 // -------- CurrentEL SPx -----------//
     // synchronous
-    .align  7
+    .balign 0x80
     mov     x0, #0
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -311,7 +313,7 @@ _hyper_vectors:
     b       exc_hyper_handler_current
 
     // IRQ
-    .align  7
+    .balign 0x80
     mov     x0, #1
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -320,7 +322,7 @@ _hyper_vectors:
     b       exc_hyper_handler_current
 
     // FIQ
-    .align  7
+    .balign 0x80
     mov     x0, #2
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -329,7 +331,7 @@ _hyper_vectors:
     b       exc_hyper_handler_current
 
     // SError
-    .align  7
+    .balign 0x80
     mov     x0, #3
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -339,7 +341,7 @@ _hyper_vectors:
 
 // -------- Lower EL using AArch64 -----------//
     // synchronous
-    .align  7
+    .balign 0x80
     mov     x0, #0
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -348,7 +350,7 @@ _hyper_vectors:
     b       exc_hyper_handler_lower
 
     // IRQ
-    .align  7
+    .balign 0x80
     mov     x0, #1
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -357,7 +359,7 @@ _hyper_vectors:
     b       exc_hyper_handler_lower
 
     // FIQ
-    .align  7
+    .balign 0x80
     mov     x0, #2
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -366,7 +368,7 @@ _hyper_vectors:
     b       exc_hyper_handler_lower
 
     // SError
-    .align  7
+    .balign 0x80
     mov     x0, #3
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -376,7 +378,7 @@ _hyper_vectors:
 
 // -------- Lower EL using AArch32 -----------//
     // synchronous
-    .align  7
+    .balign 0x80
     mov     x0, #0
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -385,7 +387,7 @@ _hyper_vectors:
     b       exc_hyper_handler_lower
 
     // IRQ
-    .align  7
+    .balign 0x80
     mov     x0, #1
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -394,7 +396,7 @@ _hyper_vectors:
     b       exc_hyper_handler_lower
 
     // FIQ
-    .align  7
+    .balign 0x80
     mov     x0, #2
     mrs     x1, esr_el2
     mrs     x2, elr_el2
@@ -403,7 +405,7 @@ _hyper_vectors:
     b       exc_hyper_handler_lower
 
     // SError
-    .align  7
+    .balign 0x80
     mov     x0, #3
     mrs     x1, esr_el2
     mrs     x2, elr_el2

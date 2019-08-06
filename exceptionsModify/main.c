@@ -26,9 +26,29 @@
 #include "uart.h"
 #include "mmu.h"
 
+void go_to_el0(){
+    asm volatile ("mov     x2, #(0)"); //The Ret Stack Pointer of EL1h
+/*    orr     x2, x2, #(1<<4) //FIQ mask
+    orr     x2, x2, #(1<<6) //FIQ mask
+    orr     x2, x2, #(1<<7) //IRQ mask
+    orr     x2, x2, #(1<<8) //SError mask
+    orr     x2, x2, #(1<<9) //Debug mask
+*/
+    asm volatile ("msr     spsr_el1, x2");
+    asm volatile ("adr     x2, el0");
+    asm volatile ("msr     elr_el1, x2");
+    asm volatile ("eret");
+}
+
+void el0(){
+    asm volatile ("SVC #0");
+    uart_puts("Im In EL0");
+    while(1);
+}
+
 void main()
 {
-    unsigned int r;
+    // unsigned int r;
     unsigned long el;
 
     // set up serial console
@@ -36,21 +56,24 @@ void main()
 
     asm volatile ("mrs %0, CurrentEL" : "=r" (el));
 
-
+    // asm volatile ("mov x0, #0");
+    // asm volatile ("msr mair_el1, x0");
 
     uart_puts("Current EL is: ");
     uart_hex((el>>2)&3);
     uart_puts("\n");
 
-    mmu_init();
+    go_to_el0();
+
+    // mmu_init();
     
     // set up paging
     
 
     // generate a Data Abort with a bad address access
-    r=*((volatile unsigned int*)0xFFFFFFFFFF000000);
+    // r=*((volatile unsigned int*)0xFFFFFFFFFF000000);
     // make gcc happy about unused variables :-)
-    r++;
+    // r++;
 
     uart_puts("SuccessFully Returned From Handler\n");
     // echo everything back

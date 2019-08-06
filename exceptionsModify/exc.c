@@ -90,43 +90,51 @@ void exc_handler(unsigned long type, unsigned long esr, unsigned long elr, unsig
     // Skips over the faulting address
     uart_puts("\n");
     uart_hex(elr);
-    elr = elr + 4;
+    elr = elr + 1;
     asm volatile ("msr esr_el1, %0"::"r" (elr));
     asm volatile ("mrs %0, esr_el1":"=r" (elr));
     uart_puts("\n");
     uart_hex(elr);
     uart_puts("\n");
-    // asm volatile ("mov x2, #(1<<2)");
-    // asm volatile ("msr spsr_el1, x2");
-    // asm volatile ("eret");
+    asm volatile ("mov x2, #(1<<2)");
+    asm volatile ("msr spsr_el1, x2");
+    asm volatile ("eret");
     // no return from exception for now
     while(1);
 }
 
+void exc_to_el2(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, unsigned long far)
+{
+    asm volatile ("HVC #0");
+    uart_puts("I have Been Redirected to el2\n");
+    asm volatile ("eret");
+}
+
 void exc_hyper_handler_lower(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, unsigned long far)
 {
-    void * el1_vector_table;
+    // void * el1_vector_table;
 
     uart_puts("Hyper Event Lower Handler\n");
 
-    asm volatile ("msr esr_el1, %0"::"r" (esr));
-    asm volatile ("msr elr_el1, %0"::"r" (elr));
-    asm volatile ("msr spsr_el1, %0"::"r" (spsr));
-    asm volatile ("msr far_el1, %0"::"r" (far));
+    // asm volatile ("msr esr_el1, %0"::"r" (esr));
+    // asm volatile ("msr elr_el1, %0"::"r" (elr));
+    // asm volatile ("msr spsr_el1, %0"::"r" (spsr));
+    // asm volatile ("msr far_el1, %0"::"r" (far));
 
-    asm volatile ("mov x2, #(1<<2)");
-    asm volatile ("msr spsr_el2, x2");
+    // asm volatile ("mov x2, #(1<<2)");
+    // asm volatile ("msr spsr_el2, x2");
 
-    // So It Maps To the correct interupt handler 
+    // // So It Maps To the correct interupt handler 
     // asm volatile ("mrs %0, vbar_el1":"=r" (el1_vector_table));
     // el1_vector_table = el1_vector_table + (type * 128);
     // asm volatile ("msr elr_el2, %0"::"r" (el1_vector_table));
-    // asm volatile ("eret");
+    asm volatile ("eret");
     while(1);
 }
 
 void exc_hyper_handler_current(unsigned long type, unsigned long esr, unsigned long elr, unsigned long spsr, unsigned long far)
 {
+    while(1);
     
     void * returnAddress;
     void * el1_vector_table;
